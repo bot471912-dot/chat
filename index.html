@@ -22,13 +22,18 @@ button{margin-top:5px;padding:8px;width:100%;background:#333;color:#fff;border:n
 <body>
 
 <div id="loginPage" class="login">
-<h2>Connexion</h2>
+<h2>Accès au site</h2>
 <input id="usernameInput" placeholder="Pseudo">
 <button onclick="login()">Entrer</button>
 </div>
 
 <div id="app" style="display:none">
-<div class="banner"><h1> </h1></div>
+<div class="banner">
+  <h1> </h1>
+</div>
+<div id="onlineCount" style="margin-top:5px; font-size:16px; color:#226ee0;">
+  Members: 1
+</div>
 
 
 <div class="layout">
@@ -116,6 +121,7 @@ async function loadChat(){
 
 // 🔄 Auto refresh posts/chat toutes les 5s
 setInterval(()=>{ if(user) { loadPosts(); loadChat(); } }, 5000);
+
 
 </script>
 </body>
