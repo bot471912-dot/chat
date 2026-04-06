@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!-- saved from url=(0070)file:///C:/Users/ulysse/Desktop/test%20html%20ulysse/public/index.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Chat + Posts Anonymes</title>
+<style>
+body{margin:0;font-family:Arial;background:#0d0d0d;color:#fff}
+.banner{height:180px;background:url('https://picsum.photos/1200/300?blur=3') center/cover;display:flex;align-items:center;justify-content:center}
+.banner h1{background:rgba(0,0,0,0.7);padding:10px 20px;border-radius:10px}
+
+.layout{max-width:1000px;margin:auto;padding:20px}
+
+.createPost{
+background:#111;
+padding:15px;
+border-radius:10px;
+width:300px;
+margin-bottom:20px;
+}
+
+.posts{
+margin-top:10px;
+}
+
+.post{background:#1a1a1a;padding:15px;margin:10px 0;border-radius:10px;position:relative}
+.delete{
+position:absolute;
+top:10px;
+right:10px;
+background:transparent;
+border:1px solid #ff0033;
+color:#ff0033;
+padding:3px 8px;
+border-radius:6px;
+font-size:12px;
+cursor:pointer;
+transition:all 0.2s ease;
+box-shadow:0 0 5px #ff0033;
+}
+
+.delete:hover{
+background:#ff0033;
+color:#000;
+box-shadow:0 0 10px #ff0033, 0 0 20px #ff0033;
+transform:scale(1.1);
+}
+
+.chatBox{
+position:fixed;
+bottom:20px;
+right:20px;
+width:300px;
+background:#111;
+padding:10px;
+border-radius:10px;
+box-shadow:0 0 10px #000;
+}
+
+.chatMessages{max-height:200px;overflow-y:auto;font-size:12px;margin-bottom:5px}
+
+input,textarea{width:100%;margin-top:5px;padding:8px;background:#222;color:#fff;border:none}
+button{margin-top:5px;padding:8px;width:100%;background:#333;color:#fff;border:none;cursor:pointer}
+
+.login{max-width:300px;margin:50px auto;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="loginPage" class="login" style="display: none;">
+<h2>Connexion</h2>
+<input id="username" placeholder="Pseudo">
+<button onclick="login()">Entrer</button>
+</div>
+
+<div id="app" style="display: block;">
+<div class="banner"><h1>Anonyme</h1></div>
+
+<div class="layout">
+
+<!-- CREATE POST TOP LEFT -->
+<div class="createPost">
+<h3>Créer un post</h3>
+<textarea id="postInput" placeholder="Ton message..."></textarea>
+<button onclick="addPost()">Poster</button>
+</div>
+
+<!-- POSTS FEED -->
+<div id="postsPage" class="posts"><div class="post"><b>a</b><p>aa</p></div></div>
+
+</div>
+
+<!-- CHAT BOTTOM RIGHT -->
+<div class="chatBox">
+<div id="chatMessages" class="chatMessages"><div><b>a:</b> aa</div><div><b>a:</b> aa</div><div><b>aa:</b> aa</div><div><b>aa:</b> aazaz</div></div>
+<input id="chatInput" placeholder="Message chat">
+<button onclick="sendChat()">Envoyer</button>
+</div>
+
+</div>
+
+<script>
+let user=null;
+let posts=JSON.parse(localStorage.getItem('posts')||'[]');
+let chat=JSON.parse(localStorage.getItem('chat')||'[]');
+let userPostsToday=0;
+let lastReset=localStorage.getItem('lastReset')||Date.now();
+
+function login(){
+user=document.getElementById('username').value||'Anonyme';
+document.getElementById('loginPage').style.display='none';
+document.getElementById('app').style.display='block';
+renderPosts();renderChat();
+}
+
+function resetDaily(){
+if(Date.now()-lastReset>86400000){
+userPostsToday=0;
+localStorage.setItem('lastReset',Date.now());
+}
+}
+
+function addPost(){
+resetDaily();
+if(userPostsToday>=5){alert('5 posts max/jour');return}
+const msg=document.getElementById('postInput').value;
+if(!msg)return;
+posts.push({id:Date.now(),user,msg,date:Date.now()});
+userPostsToday++;
+if(posts.length>100)posts.shift();
+save();renderPosts();
+document.getElementById('postInput').value='';
+}
+
+
+
+function cleanPosts(){
+posts=posts.filter(p=>Date.now()-p.date<7*86400000);
+}
+
+function renderPosts(){
+cleanPosts();
+const el=document.getElementById('postsPage');
+el.innerHTML='';
+posts.forEach(p=>{
+const d=document.createElement('div');
+d.className='post';
+d.innerHTML=`<b>${p.user}</b><p>${p.msg}</p>`;
+
+el.appendChild(d);
+});
+}
+
+function sendChat(){
+const msg=document.getElementById('chatInput').value;
+if(!msg)return;
+chat.push({user,msg});
+if(chat.length>100)chat.shift();
+save();renderChat();
+document.getElementById('chatInput').value='';
+}
+
+function renderChat(){
+const el=document.getElementById('chatMessages');
+el.innerHTML='';
+chat.forEach(c=>{
+const d=document.createElement('div');
+d.innerHTML=`<b>${c.user}:</b> ${c.msg}`;
+el.appendChild(d);
+});
+}
+
+function save(){
+localStorage.setItem('posts',JSON.stringify(posts));
+localStorage.setItem('chat',JSON.stringify(chat));
+}
+</script>
+
+
+
+</body></html>
